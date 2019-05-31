@@ -56,7 +56,7 @@ lazy val commonLibrarySettings = libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.7" % Test,
   "com.typesafe.akka" %% "akka-actor" % akkaVersion % Test,
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
-  "javax.ws.rs" % "javax.ws.rs-api" % "2.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
+  "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
 )
 
 lazy val root = (project in file("."))
