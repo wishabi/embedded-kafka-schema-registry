@@ -3,20 +3,15 @@ import sbtrelease.Version
 val embeddedKafkaVersion = "2.2.0"
 val confluentVersion = "5.2.1"
 val akkaVersion = "2.5.23"
+val flipplib = "http://flipplib.jfrog.io/flipplib/"
 
 lazy val publishSettings = Seq(
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+  publishArtifact := true,
   publishArtifact in Test := false,
+  publishTo := Some("FlippLib Releases" at flipplib + "libs-release-local"),
   // https://github.com/sbt/sbt/issues/3570#issuecomment-432814188
-  updateOptions := updateOptions.value.withGigahorse(false),
-  developers := List(
-    Developer(
-      "manub",
-      "Emanuele Blanco",
-      "emanuele.blanco@gmail.com",
-      url("http://twitter.com/manub")
-    )
-  )
+  updateOptions := updateOptions.value.withGigahorse(false)
 )
 
 import ReleaseTransformations._
@@ -73,3 +68,12 @@ lazy val root = (project in file("."))
     "confluent" at "https://packages.confluent.io/maven/",
     Resolver.sonatypeRepo("snapshots")
   ))
+
+// Credentials for flipp artifactory
+(sys.env.get("ARTIFACTORY_USER"), sys.env.get("ARTIFACTORY_API_KEY")) match {
+  case (Some(username), Some(password)) =>
+    credentials += Credentials("Artifactory Realm", "flipplib.jfrog.io", username, password)
+  case _ =>
+    println("USERNAME and/or PASSWORD is missing")
+    credentials ++= Seq()
+}
