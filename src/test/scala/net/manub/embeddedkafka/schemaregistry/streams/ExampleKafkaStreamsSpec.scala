@@ -57,9 +57,12 @@ class ExampleKafkaStreamsSpec
 
     "support kafka streams and generic record" in {
       val schema: Schema = TestAvroClass.SCHEMA$
-      val record1: GenericRecord = new GenericRecordBuilder(schema).set("name", "world").build()
-      val record2: GenericRecord = new GenericRecordBuilder(schema).set("name", "bar").build()
-      val record3: GenericRecord = new GenericRecordBuilder(schema).set("name", "yaz").build()
+      val record1: GenericRecord =
+        new GenericRecordBuilder(schema).set("name", "world").build()
+      val record2: GenericRecord =
+        new GenericRecordBuilder(schema).set("name", "bar").build()
+      val record3: GenericRecord =
+        new GenericRecordBuilder(schema).set("name", "yaz").build()
 
       val streamBuilder = new StreamsBuilder
       val stream: KStream[String, GenericRecord] =
