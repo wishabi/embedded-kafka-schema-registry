@@ -39,7 +39,7 @@ lazy val releaseSettings = Seq(
 )
 
 lazy val commonSettings = Seq(
-  organization := "io.github.embeddedkafka",
+  organization := "com.flipp.dataplatform",
   scalaVersion := "2.12.8",
   crossScalaVersions := Seq("2.12.8", "2.11.12"),
   homepage := Some(url("https://github.com/embeddedkafka/embedded-kafka-schema-registry")),
@@ -53,6 +53,7 @@ lazy val commonSettings = Seq(
 
 lazy val commonLibrarySettings = libraryDependencies ++= Seq(
   "io.github.embeddedkafka" %% "embedded-kafka-streams" % embeddedKafkaVersion,
+  "io.confluent" % "kafka-streams-avro-serde" % confluentVersion,
   "io.confluent" % "kafka-avro-serializer" % confluentVersion,
   "io.confluent" % "kafka-schema-registry" % confluentVersion,
   "io.confluent" % "kafka-schema-registry" % confluentVersion classifier "tests",

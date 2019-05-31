@@ -47,6 +47,13 @@ abstract class EmbeddedKafkaSpecSupport
     expectMsg(1 second, Connection.Success)
   }
 
+  def kafkaSSLIsAvailable(kafkaSSLPort: Int = 6002): Unit = {
+    system.actorOf(
+      TcpClient.props(new InetSocketAddress("localhost", kafkaSSLPort),
+                      testActor))
+    expectMsg(1 second, Connection.Success)
+  }
+
   def zookeeperIsAvailable(zookeeperPort: Int = 6000): Unit = {
     system.actorOf(
       TcpClient.props(new InetSocketAddress("localhost", zookeeperPort),
@@ -57,6 +64,13 @@ abstract class EmbeddedKafkaSpecSupport
   def kafkaIsNotAvailable(kafkaPort: Int = 6001): Unit = {
     system.actorOf(
       TcpClient.props(new InetSocketAddress("localhost", kafkaPort), testActor))
+    expectMsg(1 second, Connection.Failure)
+  }
+
+  def kafkaSSLIsNotAvailable(kafkaSSLPort: Int = 6002): Unit = {
+    system.actorOf(
+      TcpClient.props(new InetSocketAddress("localhost", kafkaSSLPort),
+                      testActor))
     expectMsg(1 second, Connection.Failure)
   }
 

@@ -1,0 +1,65 @@
+defaults: &defaults
+  working_directory: ~/tmp
+  docker:
+    - image: 421990735784.dkr.ecr.us-east-1.amazonaws.com/ci-build-environment:sbt_0.13.15
+      aws_auth:
+        aws_access_key_id: $AWS_ACCESS_KEY_ID
+        aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+
+version: 2
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - scala-sbt-v1-{{ checksum "build.sbt" }}
+      - run:
+          command: |
+            /usr/local/bin/platform-param-decrypt_linux > ~/.env
+            sbt test exit
+          environment:
+            SERVICE: global
+            ENVIRONMENT: production
+            ARTIFACTORY_USER: flippcircleci
+            BASH_ENV: ~/.env
+      - save_cache:
+          key: scala-sbt-v1-{{ checksum "build.sbt" }}
+          paths:
+            - ~/.sbt
+            - ~/.iv2/cache
+      - store_test_results:
+          path: impl/target/test-reports
+
+  publish_to_artifactory:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - scala-sbt-v1-{{ checksum "build.sbt" }}
+      - attach_workspace:
+          at: ~/tmp
+      - run:
+          name: Deploy to Artifactory
+          command: |
+            /usr/local/bin/platform-param-decrypt_linux > ~/.env
+            sbt compile package publish exit
+          environment:
+            SERVICE: global
+            ENVIRONMENT: production
+            ARTIFACTORY_USER: flippcircleci
+            BASH_ENV: ~/.env
+
+workflows:
+  version: 2
+  test-publish-to-artifactory:
+    jobs:
+      - test
+      - publish_to_artifactory:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master

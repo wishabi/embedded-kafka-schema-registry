@@ -85,7 +85,9 @@ trait RunningSchemaRegistryOps {
 
   def startSchemaRegistry(implicit config: EmbeddedKafkaConfig): EmbeddedSR = {
     val restApp = EmbeddedSR(
-      startSchemaRegistry(config.schemaRegistryPort, config.zooKeeperPort))
+      startSchemaRegistry(config.schemaRegistryPort,
+                          config.zooKeeperPort,
+                          config.avroCompatibilityLevel))
     runningServers.add(restApp)
     restApp
   }
