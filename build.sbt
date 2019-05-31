@@ -67,7 +67,11 @@ lazy val root = (project in file("."))
   .settings(releaseSettings: _*)
   .settings(resolvers ++= Seq(
     "confluent" at "https://packages.confluent.io/maven/",
-    Resolver.sonatypeRepo("snapshots")
+    "Flipplib Ext-Releases-Local" at flipplib + "ext-release-local",
+    "FlippLib Snapshots" at flipplib + "libs-snapshot-local",
+    "FlippLib Releases" at flipplib + "libs-release-local",
+    Resolver.sonatypeRepo("snapshots"),
+    Resolver.jcenterRepo
   ))
 
 // Credentials for flipp artifactory
