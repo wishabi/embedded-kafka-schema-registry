@@ -1,7 +1,7 @@
 import sbtrelease.Version
 
 val embeddedKafkaVersion = "2.2.0"
-val confluentVersion = "5.2.1"
+val confluentVersion = "5.0.3"
 val akkaVersion = "2.5.23"
 val flipplib = "http://flipplib.jfrog.io/flipplib/"
 
