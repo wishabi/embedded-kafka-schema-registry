@@ -1,54 +1,72 @@
 package net.manub.embeddedkafka
 
-import io.confluent.kafka.streams.serdes.avro.{
-  GenericAvroSerde,
-  SpecificAvroSerde
+import io.confluent.kafka.serializers.{
+  KafkaAvroDeserializer => ConfluentKafkaAvroDeserializer,
+  KafkaAvroSerializer => ConfluentKafkaAvroSerializer
 }
 import net.manub.embeddedkafka.schemaregistry.EmbeddedKafka.{
   configForSchemaRegistry,
-  consumerConfigForSchemaRegistry
+  specificAvroReaderConfigForSchemaRegistry
 }
 import net.manub.embeddedkafka.schemaregistry.{
   EmbeddedKafkaConfig => EmbeddedKafkaSRConfig
 }
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.specific.SpecificRecord
-import org.apache.kafka.common.serialization.{Serde, Serializer, Deserializer}
+import org.apache.kafka.common.serialization.{
+  Deserializer,
+  Serde,
+  Serdes,
+  Serializer
+}
 
 import scala.collection.JavaConverters._
 
 package object schemaregistry {
-  implicit def specificAvroSerde[T <: SpecificRecord](
+  // SpecificRecord
+  implicit def specificAvroValueSerde[T <: SpecificRecord](
       implicit config: EmbeddedKafkaSRConfig): Serde[T] = {
-    val serde = new SpecificAvroSerde
-    serde.configure(consumerConfigForSchemaRegistry.asJava, false)
-    serde.asInstanceOf[Serde[T]]
+    serdeFrom[T](configForSchemaRegistry,
+                 specificAvroReaderConfigForSchemaRegistry,//need this to support SpecificRecord
+                 isKey = false)
   }
 
-  implicit def specificAvroSerializer[T <: SpecificRecord](
+  implicit def specificAvroValueSerializer[T <: SpecificRecord](
       implicit config: EmbeddedKafkaSRConfig): Serializer[T] = {
-    specificAvroSerde.serializer.asInstanceOf[Serializer[T]]
+    specificAvroValueSerde[T].serializer
   }
 
-  implicit def specificAvroDeserializer[T <: SpecificRecord](
+  implicit def specificAvroValueDeserializer[T <: SpecificRecord](
       implicit config: EmbeddedKafkaSRConfig): Deserializer[T] = {
-    specificAvroSerde.deserializer.asInstanceOf[Deserializer[T]]
+    specificAvroValueSerde[T].deserializer
   }
 
-  implicit def genericAvroSerde(
+  // GenericRecord
+  implicit def genericAvroValueSerde(
       implicit config: EmbeddedKafkaSRConfig): Serde[GenericRecord] = {
-    val serde = new GenericAvroSerde
-    serde.configure(configForSchemaRegistry.asJava, false)
-    serde
+    serdeFrom[GenericRecord](configForSchemaRegistry,
+                             configForSchemaRegistry,
+                             isKey = false)
   }
 
-  implicit def genericAvroSerializer(
+  implicit def genericAvroValueSerializer(
       implicit config: EmbeddedKafkaSRConfig): Serializer[GenericRecord] = {
-    genericAvroSerde.serializer
+    genericAvroValueSerde.serializer
   }
 
-  implicit def genericAvroDeserializer(
+  implicit def genericAvroValueDeserializer(
       implicit config: EmbeddedKafkaSRConfig): Deserializer[GenericRecord] = {
-    genericAvroSerde.deserializer
+    genericAvroValueSerde.deserializer
+  }
+
+  private def serdeFrom[T](serConfig: Map[String, Object],
+                           deserConfig: Map[String, Object],
+                           isKey: Boolean) = {
+    val ser = new ConfluentKafkaAvroSerializer
+    ser.configure(serConfig.asJava, isKey)
+    val deser = new ConfluentKafkaAvroDeserializer
+    deser.configure(deserConfig.asJava, isKey)
+
+    Serdes.serdeFrom(ser, deser).asInstanceOf[Serde[T]]
   }
 }

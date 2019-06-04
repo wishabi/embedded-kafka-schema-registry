@@ -16,7 +16,7 @@ trait EmbeddedKafka
 
   override private[embeddedkafka] def baseConsumerConfig(
       implicit config: EmbeddedKafkaConfig): Map[String, Object] =
-    defaultConsumerConfig ++ consumerConfigForSchemaRegistry ++ config.customConsumerProperties
+    defaultConsumerConfig ++ configForSchemaRegistry ++ config.customConsumerProperties
 
   override private[embeddedkafka] def baseProducerConfig(
       implicit config: EmbeddedKafkaConfig): Map[String, Object] =

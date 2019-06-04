@@ -28,7 +28,8 @@ class ExampleKafkaStreamsSpec
   val (inTopic, outTopic) = ("in", "out")
 
   val stringSerde: Serde[String] = Serdes.String()
-  val avroSerde: Serde[TestAvroClass] = specificAvroSerde[TestAvroClass]
+  val avroSerde: Serde[TestAvroClass] =
+    specificAvroValueSerde[TestAvroClass]
 
   "A Kafka streams test using Schema Registry" should {
     "support kafka streams and specific record" in {
@@ -66,10 +67,11 @@ class ExampleKafkaStreamsSpec
 
       val streamBuilder = new StreamsBuilder
       val stream: KStream[String, GenericRecord] =
-        streamBuilder.stream(inTopic,
-                             Consumed.`with`(stringSerde, genericAvroSerde))
+        streamBuilder.stream(
+          inTopic,
+          Consumed.`with`(stringSerde, genericAvroValueSerde))
 
-      stream.to(outTopic, Produced.`with`(stringSerde, genericAvroSerde))
+      stream.to(outTopic, Produced.`with`(stringSerde, genericAvroValueSerde))
 
       runStreams(Seq(inTopic, outTopic), streamBuilder.build()) {
         publishToKafka(inTopic, "hello", record1)
