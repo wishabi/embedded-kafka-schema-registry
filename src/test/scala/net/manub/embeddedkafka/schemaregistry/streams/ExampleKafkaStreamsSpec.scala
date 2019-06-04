@@ -58,11 +58,11 @@ class ExampleKafkaStreamsSpec
 
     "support kafka streams and generic record" in {
       val schema: Schema = TestAvroClass.SCHEMA$
-      val record1: GenericRecord =
+      val recordWorld: GenericRecord =
         new GenericRecordBuilder(schema).set("name", "world").build()
-      val record2: GenericRecord =
+      val recordBar: GenericRecord =
         new GenericRecordBuilder(schema).set("name", "bar").build()
-      val record3: GenericRecord =
+      val recordYaz: GenericRecord =
         new GenericRecordBuilder(schema).set("name", "yaz").build()
 
       val streamBuilder = new StreamsBuilder
@@ -74,17 +74,17 @@ class ExampleKafkaStreamsSpec
       stream.to(outTopic, Produced.`with`(stringSerde, genericAvroValueSerde))
 
       runStreams(Seq(inTopic, outTopic), streamBuilder.build()) {
-        publishToKafka(inTopic, "hello", record1)
-        publishToKafka(inTopic, "foo", record2)
-        publishToKafka(inTopic, "baz", record3)
+        publishToKafka(inTopic, "hello", recordWorld)
+        publishToKafka(inTopic, "foo", recordBar)
+        publishToKafka(inTopic, "baz", recordYaz)
 
         withConsumer[String, GenericRecord, Unit] { consumer =>
           val consumedMessages: Stream[(String, GenericRecord)] =
             consumer.consumeLazily[(String, GenericRecord)](outTopic)
           consumedMessages.take(2) should be(
-            Seq("hello" -> record1, "foo" -> record2))
+            Seq("hello" -> recordWorld, "foo" -> recordBar))
           val h :: _ = consumedMessages.drop(2).toList
-          h should be("baz" -> record3)
+          h should be("baz" -> recordYaz)
         }
       }
     }
