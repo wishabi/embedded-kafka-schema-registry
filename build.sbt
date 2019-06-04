@@ -64,7 +64,8 @@ dependencyOverrides ++= Seq(
   "org.apache.kafka" %% "kafka" % kafkaVersion,
   "org.apache.kafka" % "kafka-streams" % kafkaVersion,
   "org.apache.kafka" % "kafka-clients" % kafkaVersion,
-  "org.apache.kafka" % "connect-api" % kafkaVersion
+  "org.apache.kafka" % "connect-api" % kafkaVersion,
+  "org.apache.kafka" % "connect-json" % kafkaVersion
 )
 
 lazy val root = (project in file("."))
