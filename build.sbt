@@ -1,7 +1,8 @@
 import sbtrelease.Version
 
-val embeddedKafkaVersion = "2.2.0"
+val embeddedKafkaVersion = "2.1.0"
 val confluentVersion = "5.0.3"
+val kafkaVersion = "2.0.1"
 val akkaVersion = "2.5.23"
 val flipplib = "http://flipplib.jfrog.io/flipplib/"
 
@@ -56,6 +57,14 @@ lazy val commonLibrarySettings = libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion % Test,
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
   "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts Artifact("javax.ws.rs-api", "jar", "jar")
+)
+
+// Add these to match our broker versions, to be removed after cluster upgrade
+dependencyOverrides ++= Seq(
+  "org.apache.kafka" %% "kafka" % kafkaVersion,
+  "org.apache.kafka" % "kafka-streams" % kafkaVersion,
+  "org.apache.kafka" % "kafka-clients" % kafkaVersion,
+  "org.apache.kafka" % "connect-api" % kafkaVersion
 )
 
 lazy val root = (project in file("."))

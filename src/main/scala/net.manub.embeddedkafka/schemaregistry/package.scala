@@ -26,9 +26,10 @@ package object schemaregistry {
   // SpecificRecord
   implicit def specificAvroValueSerde[T <: SpecificRecord](
       implicit config: EmbeddedKafkaSRConfig): Serde[T] = {
-    serdeFrom[T](configForSchemaRegistry,
-                 specificAvroReaderConfigForSchemaRegistry,//need this to support SpecificRecord
-                 isKey = false)
+    serdeFrom[T](
+      configForSchemaRegistry,
+      specificAvroReaderConfigForSchemaRegistry, //need this to support SpecificRecord
+      isKey = false)
   }
 
   implicit def specificAvroValueSerializer[T <: SpecificRecord](
