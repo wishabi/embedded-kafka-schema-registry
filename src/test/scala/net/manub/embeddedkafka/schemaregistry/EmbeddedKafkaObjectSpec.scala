@@ -9,29 +9,35 @@ class EmbeddedKafkaObjectSpec extends EmbeddedKafkaSpecSupport {
       "start and stop a specific Kafka along with Schema Registry" in {
         val firstBroker = EmbeddedKafka.start()(
           EmbeddedKafkaConfig(kafkaPort = 7000,
+                              kafkaSSLPort = 7003,
                               zooKeeperPort = 7001,
                               schemaRegistryPort = 7002))
         EmbeddedKafka.start()(
           EmbeddedKafkaConfig(kafkaPort = 8000,
+                              kafkaSSLPort = 8003,
                               zooKeeperPort = 8001,
                               schemaRegistryPort = 8002))
 
         schemaRegistryIsAvailable(7002)
         kafkaIsAvailable(7000)
+        kafkaSSLIsAvailable(7003)
         zookeeperIsAvailable(7001)
 
         schemaRegistryIsAvailable(8002)
         kafkaIsAvailable(8000)
+        kafkaSSLIsAvailable(8003)
         zookeeperIsAvailable(8001)
 
         EmbeddedKafka.stop(firstBroker)
 
         schemaRegistryIsNotAvailable(7002)
         kafkaIsNotAvailable(7000)
+        kafkaIsNotAvailable(7003)
         zookeeperIsNotAvailable(7001)
 
         schemaRegistryIsAvailable(8002)
         kafkaIsAvailable(8000)
+        kafkaIsAvailable(8003)
         zookeeperIsAvailable(8001)
 
         EmbeddedKafka.stop()
@@ -40,6 +46,7 @@ class EmbeddedKafkaObjectSpec extends EmbeddedKafkaSpecSupport {
       "start and stop Kafka, Zookeeper, and Schema Registry on different specified ports using an implicit configuration" in {
         implicit val config: EmbeddedKafkaConfig =
           EmbeddedKafkaConfig(kafkaPort = 12345,
+                              kafkaSSLPort = 12354,
                               zooKeeperPort = 54321,
                               schemaRegistryPort = 13542)
 
@@ -47,6 +54,7 @@ class EmbeddedKafkaObjectSpec extends EmbeddedKafkaSpecSupport {
 
         schemaRegistryIsAvailable(13542)
         kafkaIsAvailable(12345)
+        kafkaSSLIsAvailable(12354)
         zookeeperIsAvailable(54321)
 
         EmbeddedKafka.stop()

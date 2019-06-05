@@ -1,5 +1,7 @@
 package net.manub.embeddedkafka.schemaregistry
 
+import io.confluent.kafka.schemaregistry.avro.AvroCompatibilityLevel
+
 class EmbeddedKafkaTraitSpec
     extends EmbeddedKafkaSpecSupport
     with EmbeddedKafka {
@@ -26,13 +28,21 @@ class EmbeddedKafkaTraitSpec
     }
 
     "start and stop Kafka, Zookeeper, and Schema Registry successfully on non-zero ports" in {
-      val userDefinedConfig =
-        EmbeddedKafkaConfig(kafkaPort = 12345,
-                            zooKeeperPort = 12346,
-                            schemaRegistryPort = 12347)
+      val userDefinedConfig = EmbeddedKafkaConfig(
+        kafkaPort = 12345,
+        kafkaSSLPort = 12348,
+        zooKeeperPort = 12346,
+        schemaRegistryPort = 12347,
+        avroCompatibilityLevel = AvroCompatibilityLevel.NONE
+      )
+
       val actualConfig = withRunningKafkaOnFoundPort(userDefinedConfig) {
         actualConfig =>
-          actualConfig shouldBe userDefinedConfig
+          actualConfig.kafkaPort shouldBe userDefinedConfig.kafkaSSLPort
+          actualConfig.kafkaSSLPort shouldBe userDefinedConfig.kafkaSSLPort
+          actualConfig.zooKeeperPort shouldBe userDefinedConfig.zooKeeperPort
+          actualConfig.schemaRegistryPort shouldBe userDefinedConfig.schemaRegistryPort
+          actualConfig.avroCompatibilityLevel shouldBe userDefinedConfig.avroCompatibilityLevel
           everyServerIsAvailable(actualConfig)
           actualConfig
       }
